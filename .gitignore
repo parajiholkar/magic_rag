@@ -1,0 +1,9 @@
+frontend_rag/node_modules/
+backend_rag/node_modules/
+backend_rag/.env
+
+node_modules/
+.env
+dist/
+build/
+*.log
