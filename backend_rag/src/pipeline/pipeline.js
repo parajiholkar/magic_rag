@@ -49,6 +49,8 @@ export default class Pipeline {
                 });
             }
 
+            const fileName = req.body.fileName;
+
             const blob = new Blob([pdfBuffer], { type: "application/pdf" });
 
             const loader = new PDFLoader(blob);
@@ -70,20 +72,17 @@ export default class Pipeline {
 
             const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
                 url: process.env.QDRANT_URL,
-                collectionName: "langchainjs-testing",
+                collectionName: fileName,
             });
 
             await vectorStore.addDocuments(splitDocs);
 
-
             return res.status(200).json({
                 status: 200,
                 message: 'PDF processed successfully',
-                data: splitDocs,
-                metadata: {
-                    fileName: req.file?.originalname || 'uploaded.pdf',
-                    numPages: splitDocs.length || 1,
-                },
+                name: fileName,
+                pages: docs.length,
+                chunks: splitDocs.length
             });
         } catch (error) {
             console.error('Error processing PDF:', error);

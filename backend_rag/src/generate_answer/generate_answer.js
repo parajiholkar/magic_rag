@@ -13,7 +13,16 @@ export default class GenerateAnswer {
         try {
 
             const query = req.body.query;
+            const fileName = req.body.fileName;
             console.log('query', query);
+
+            if (!query || !fileName) {
+                return res.status(400).json({
+                    status: 400,
+                    message: 'Query or FileName Missing...',
+                    sources: [],
+                });
+            }
 
             const embeddings = new GoogleGenerativeAIEmbeddings({
                 modelName: "gemini-embedding-2",
@@ -22,7 +31,7 @@ export default class GenerateAnswer {
 
             const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
                 url: process.env.QDRANT_URL,
-                collectionName: "langchainjs-testing",
+                collectionName: fileName,
             });
 
 
@@ -42,7 +51,6 @@ export default class GenerateAnswer {
                 },
             ];
 
-            console.log(messages)
             const client = new OpenAI({
                 baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
                 apiKey: process.env.GOOGLE_API_KEY,
@@ -53,12 +61,16 @@ export default class GenerateAnswer {
                 messages,
             });
 
-            console.log();
-
             return res.status(200).json({
                 status: 200,
                 message: response.choices[0].message.content,
-                search_results: search_results,
+                sources: search_results.map((doc) => {
+                    return {
+                        page: doc.metadata.loc.pageNumber,
+                        text: doc.pageContent,
+                        score: 0.80
+                    };
+                }),
             });
 
         } catch (error) {

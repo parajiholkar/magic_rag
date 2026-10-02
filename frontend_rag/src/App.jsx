@@ -36,17 +36,24 @@ export default function App() {
   }
 
   async function handleAsk(question) {
-    if (!activeDoc || busy) return;
+    if (!activeDoc || !activeDoc.name || busy) {
+      setError("Select a PDF before asking a question.");
+      return;
+    }
+
     const id = activeDoc.id;
+    const fileName = activeDoc.name;
     const history = messages.map(({ role, content }) => ({ role, content }));
+
     setChats((c) => ({
       ...c,
       [id]: [...(c[id] ?? []), { role: "user", content: question }, { role: "assistant", content: "", pending: true }],
     }));
     setBusy(true);
     setError("");
+
     try {
-      const { answer, sources } = await askQuestion(question, {
+      const { answer, sources } = await askQuestion(question, fileName, {
         docId: id,
         history,
         onToken: (t) => patchLast(id, (m) => ({ ...m, content: m.content + t })),
