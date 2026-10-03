@@ -100,3 +100,64 @@ button { cursor: pointer; }
 @media (max-width: 1100px) { .app { grid-template-columns: 250px minmax(0, 1fr); } .sources { display: none; } }
 @media (max-width: 720px) { .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; } .sidebar { max-height: 38vh; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.msg-content h1, 
+.msg-content h2, 
+.msg-content h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.msg-content p {
+  margin-bottom: 0.75rem;
+}
+
+.msg-content ul, 
+.msg-content ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.msg-content li {
+  margin-bottom: 0.25rem;
+}
+
+.msg-content :not(pre) > code {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.88em;
+}
+
+.msg-content pre {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.msg-content pre code {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85em;
+  background: transparent;
+}
+
+.msg-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75rem 0;
+}
+
+.msg-content th, 
+.msg-content td {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.msg-content th {
+  background-color: rgba(0, 0, 0, 0.05);
+}

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-const SUGGESTIONS = ["Summarize this document", "What are the key takeaways?", "List any dates or deadlines"];
+const SUGGESTIONS = ["Summarize this document", "What are the key takeaways?"];
 
 export default function Chat({ doc, messages, busy, error, indexing, onAsk, onCite, onDismissError }) {
   const [text, setText] = useState("");
@@ -53,13 +55,24 @@ export default function Chat({ doc, messages, busy, error, indexing, onAsk, onCi
 
         {messages.map((m, i) => (
           <article key={i} className={`msg ${m.role} ${m.failed ? "failed" : ""}`}>
-            <p className={m.pending && !m.content ? "typing" : ""}>
-              {m.pending && !m.content ? <><i /><i /><i /></> : m.content}
-            </p>
+            {m.pending && !m.content ? (
+              <p className="typing">
+                <i /><i /><i />
+              </p>
+            ) : (
+              <div className="msg-content">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {m.content}
+                </ReactMarkdown>
+              </div>
+            )}
+
             {m.sources?.length > 0 && (
               <div className="cites">
                 {[...new Set(m.sources.map((s) => s.page))].map((p) => (
-                  <button key={p} className="cite" onClick={() => onCite(p)}>p. {p}</button>
+                  <button key={p} className="cite" onClick={() => onCite(p)}>
+                    p. {p}
+                  </button>
                 ))}
               </div>
             )}
