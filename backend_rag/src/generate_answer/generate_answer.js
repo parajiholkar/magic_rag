@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import dotenv from "dotenv";
 import { json } from "express";
 import getSimilarityResults from "./retrieval.js";
+import { reciprocalRankFusion } from "../service/reciprocal_rank_fusion.js";
 
 dotenv.config();
 
@@ -58,7 +59,7 @@ export default class GenerateAnswer {
             ];
 
             const response = await client.chat.completions.create({
-                model: process.env.GOOGLE_GEMINI_MODEL,
+                model: process.env.GOOGLE_GEMINI_MINI_MODEL,
                 messages,
                 response_format: { type: "json_object" },
             });
@@ -74,12 +75,11 @@ export default class GenerateAnswer {
                 queries.map((q) => getSimilarityResults(q, fileName))
             );
 
-
-            const flattenedResults = nestedResults.flat();
+            const rankings = reciprocalRankFusion(nestedResults);
 
             const uniqueResults = Array.from(
                 new Map(
-                    flattenedResults.map((item) => [
+                    rankings.map((item) => [
                         item.id ?? item.text ?? item.pageContent ?? JSON.stringify(item),
                         item
                     ])
@@ -135,7 +135,7 @@ export default class GenerateAnswer {
                     return {
                         page: doc.metadata.loc.pageNumber,
                         text: doc.pageContent,
-                        score: 0.80
+                        score: Number(doc.rrfScore.toFixed(3))
                     };
                 }),
             });
